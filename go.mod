@@ -3,7 +3,6 @@ module gocanal
 go 1.24.8
 
 require (
-	github.com/BurntSushi/toml v0.3.1
 	github.com/elastic/go-elasticsearch/v7 v7.17.10
 	github.com/gin-gonic/gin v1.10.1
 	github.com/illidaris/aphrodite v0.5.89
@@ -11,8 +10,10 @@ require (
 	github.com/illidaris/configuration v1.3.11
 	github.com/illidaris/core v1.0.0
 	github.com/illidaris/gin v1.3.8
+	github.com/illidaris/logger v1.2.2
 	github.com/prometheus/client_golang v1.13.0
 	github.com/spf13/cobra v1.10.2
+	github.com/spf13/viper v1.15.0
 	github.com/withlin/canal-go v1.1.2
 	go.uber.org/zap v1.28.0
 	google.golang.org/protobuf v1.36.10
@@ -43,7 +44,6 @@ require (
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/illidaris/assembly v0.1.2 // indirect
 	github.com/illidaris/file v0.0.0-20211214105415-1252d850b318 // indirect
-	github.com/illidaris/logger v1.2.2 // indirect
 	github.com/illidaris/rest v1.5.5 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jinzhu/copier v0.3.5 // indirect
@@ -74,7 +74,6 @@ require (
 	github.com/spf13/cast v1.10.0 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.9 // indirect
-	github.com/spf13/viper v1.15.0 // indirect
 	github.com/subosito/gotenv v1.4.2 // indirect
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.3.7 // indirect
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/kms v1.3.7 // indirect
