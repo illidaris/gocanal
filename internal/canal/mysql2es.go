@@ -18,7 +18,7 @@ func Go(raw context.Context) {
 				log.Error(ctx, "%v", r)
 			}
 		}()
-		cfg := config.Config{}
+		cfg := &config.Config{}
 		if err := viper.Unmarshal(cfg); err != nil {
 			log.Error(ctx, "Failed to unmarshal config: %v", err)
 			return
@@ -45,6 +45,7 @@ func Go(raw context.Context) {
 				canal.WithSyncBatch(syncCfg.Batch),
 				canal.WithSyncTimeout(syncCfg.Timeout),
 				canal.WithSyncOuter(esOuter),
+				canal.WithSyncLogger(log.NewRestLogger()),
 			)
 			if err != nil {
 				log.Error(ctx, "NewSyncConnector: %v", err)

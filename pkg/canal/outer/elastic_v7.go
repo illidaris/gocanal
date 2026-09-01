@@ -18,7 +18,7 @@ import (
 )
 
 var clientsSm sync.RWMutex // 嵌入读写锁
-var clients map[string]*elasticsearch.Client
+var clients = map[string]*elasticsearch.Client{}
 
 type ElasticOuterOptionFunc func(*ElasticOuterOption)
 

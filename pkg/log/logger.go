@@ -12,6 +12,11 @@ import (
 
 var l *zap.Logger
 
+func NewLogger() *zap.Logger {
+	l = zap.L().WithOptions(zap.AddCallerSkip(2))
+	return l
+}
+
 func Debug(ctx context.Context, msg string, args ...interface{}) {
 	Log(ctx, fmt.Sprintf(msg, args...), zapcore.DebugLevel)
 }

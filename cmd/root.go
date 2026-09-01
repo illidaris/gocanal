@@ -4,6 +4,7 @@ Copyright © 2026 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"gocanal/pkg/log"
 	"os"
 
 	"github.com/illidaris/logger"
@@ -52,5 +53,11 @@ func init() {
 
 func initConfig() {
 	logger.New(nil)
+	log.NewLogger()
 	viper.SetConfigFile(cfgFile)
+	if err := viper.ReadInConfig(); err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
+			panic(err)
+		}
+	}
 }

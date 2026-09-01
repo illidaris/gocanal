@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"gocanal/internal/canal"
+	canalEx "gocanal/pkg/canal"
 	"strings"
 
 	"github.com/illidaris/aphrodite/ginhandle/middleware"
@@ -13,7 +14,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/illidaris/aphrodite/ginhandle"
-	"github.com/illidaris/configuration"
+
 	ginEx "github.com/illidaris/gin"
 )
 
@@ -44,11 +45,12 @@ func Run() {
 			}
 			return url
 		}),
+		ginhandle.WithCollectors(canalEx.ReqNum, canalEx.DeleteNum, canalEx.IndexNum),
 		ginhandle.WithGinInnerHandle(func(e *gin.Engine) {}),
 	)
 	canal.Go(ctx)
 
-	port := configuration.DefaultCenter.GetPort()
+	port := 8080
 	lsn := fmt.Sprintf(":%d", port)
 	// run
 	ginEx.GracefulRunWithAop(ctx, engine, lsn, time.Second*5, func(_ int) {}, func() {})
