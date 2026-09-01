@@ -1,0 +1,15 @@
+es_name: elasticsearch
+es_urls:
+  - http://elasticsearch:9200
+es_user: ""
+es_pwd: ""
+canal_ip: canal
+canal_port: 11111
+canal_user: admin
+canal_pwd: ""
+syncs:
+  - instance: example
+    index: example
+    filter: "example\\..*"
+    batch: 100
+    timeout: 1s
