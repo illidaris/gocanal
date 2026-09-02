@@ -6,13 +6,12 @@ import (
 	"sync/atomic"
 
 	pbe "github.com/withlin/canal-go/protocol/entry"
-	"google.golang.org/protobuf/proto"
 )
 
-type ColsToKVsHandle func(columns []*pbe.Column) (string, map[string]string)
+type ColsToKVsHandle func(columns []*pbe.Column) (string, map[string]any)
 
-func DefaultColsToDoc(columns []*pbe.Column) (string, map[string]string) {
-	doc := make(map[string]string, len(columns))
+func DefaultColsToDoc(columns []*pbe.Column) (string, map[string]any) {
+	doc := make(map[string]any, len(columns))
 	var id string
 	for _, column := range columns {
 		value := column.GetValue()
@@ -33,7 +32,7 @@ type ValueChangeCbHandle func(context.Context, string, []*pbe.Column, []*pbe.Col
 type IOuter interface {
 	Stats() OperateStats
 	Close(context.Context) error
-	Sync(context.Context, string, ColsToKVsHandle, ...pbe.Entry) (bool, error)
+	Sync(ctx context.Context, entries ...Entry) (bool, error)
 	Check(ctx context.Context, key string) error
 	SyncStruct(ctx context.Context, key, index, mapping string) error
 }
@@ -63,24 +62,10 @@ func (i *StdOuter) Close(context.Context) error {
 	return nil
 }
 
-func (i *StdOuter) Sync(_ context.Context, index string, colsToKVs ColsToKVsHandle, entries ...pbe.Entry) (bool, error) {
-	for k := range entries {
-		entry := &entries[k]
-		change := new(pbe.RowChange)
-		if err := proto.Unmarshal(entry.GetStoreValue(), change); err != nil {
-			return false, fmt.Errorf("decode row change: %w", err)
-		}
-		for _, row := range change.GetRowDatas() {
-			columns := row.GetAfterColumns()
-			action := ActionIndex
-			if change.GetEventType() == pbe.EventType_DELETE {
-				columns = row.GetBeforeColumns()
-				action = ActionDelete
-			}
-			id, doc := colsToKVs(columns)
-			i.Counter.Add(1)
-			fmt.Printf("[%s]%s %v", action, id, doc)
-		}
+func (i *StdOuter) Sync(ctx context.Context, entries ...Entry) (bool, error) {
+	for _, v := range entries {
+		i.Counter.Add(1)
+		fmt.Printf("[%s]%s %v", v.Act, v.Id, v.Doc)
 	}
 	return true, nil
 }

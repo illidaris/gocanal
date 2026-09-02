@@ -11,7 +11,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-func Go(ctx context.Context) {
+func Sync(ctx context.Context) {
 	defer func() {
 		if r := recover(); r != nil {
 			log.Error(ctx, "%v", r)
@@ -31,7 +31,6 @@ func Go(ctx context.Context) {
 		outer.WithESUser(cfg.ESUser),
 		outer.WithESPwd(cfg.ESPwd),
 	)
-	esOuter.WithLogger(l)
 	if err != nil {
 		log.Error(ctx, "NewElasticOuter: %v", err)
 		return
@@ -57,5 +56,4 @@ func Go(ctx context.Context) {
 		}
 		canal.NewConnectManager().AddConnector(ctx, sc)
 	}
-
 }

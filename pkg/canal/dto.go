@@ -15,6 +15,13 @@ const (
 	ActionIndex  Action = "index"  // 创建或全量替换文档（最常用）
 )
 
+type Entry struct {
+	Id    string
+	Index string
+	Act   Action
+	Doc   map[string]any
+}
+
 // OperateStats 批量操作的累计统计信息。
 type OperateStats struct {
 	NumAdded    uint64 `json:"num_added"`    // 加入批量处理队列的文档数。

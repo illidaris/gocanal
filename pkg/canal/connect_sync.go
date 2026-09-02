@@ -2,10 +2,14 @@ package canal
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
+	pbe "github.com/withlin/canal-go/protocol/entry"
+
 	"github.com/withlin/canal-go/client"
+	"google.golang.org/protobuf/proto"
 )
 
 type ISyncConnector interface {
@@ -50,7 +54,7 @@ func (c *SyncConnector) Run(ctx context.Context) error {
 	}
 	defer func() {
 		if err := c.Outer.Close(ctx); err != nil {
-			c.Logger.Error(ctx, "[gocanal]Run_OuterClose %v", err)
+			c.Log.Error(ctx, "[gocanal]Run_OuterClose %v", err)
 		}
 	}()
 
@@ -70,22 +74,70 @@ func (c *SyncConnector) Run(ctx context.Context) error {
 			time.Sleep(300 * time.Millisecond)
 			continue
 		}
-		ok, err := c.Outer.Sync(ctx, c.Index, DefaultColsToDoc, message.Entries...)
+		entries, err := c.Convert(ctx, message.Entries...)
 		if err != nil {
-			c.Logger.Error(ctx, "[gocanal]Run_SyncFunc canal entries to Outer: %v", err)
+			c.Log.Error(ctx, "[gocanal]Run_Convert canal entries: %v", err)
+			return err
+		}
+		ok, err := c.Outer.Sync(ctx, entries...)
+		if err != nil {
+			c.Log.Error(ctx, "[gocanal]Run_Sync canal entries to Outer: %v", err)
 			return err
 		}
 		if !ok {
 			stats := c.Outer.Stats()
 			okErr := fmt.Errorf("%d stats %s", batchId, stats.GetMsg(","))
-			c.Logger.Error(ctx, "[gocanal]Run_SyncFunc_NoOk %s", okErr)
+			c.Log.Error(ctx, "[gocanal]Run_SyncFunc_NoOk %s", okErr)
 			return okErr
 		}
 		if err := c.CanalConnector.Ack(batchId); err != nil {
-			c.Logger.Error(ctx, "[gocanal]Run_Ack batch_%d %v", batchId, err)
+			c.Log.Error(ctx, "[gocanal]Run_Ack batch_%d %v", batchId, err)
 			return err
 		}
 	}
+}
+
+func (c *SyncConnector) Convert(ctx context.Context, entries ...pbe.Entry) ([]Entry, error) {
+	result := []Entry{}
+	for k := range entries {
+		entry := &entries[k]
+		if entry.GetEntryType() != pbe.EntryType_ROWDATA {
+			continue
+		}
+		change := new(pbe.RowChange)
+		if err := proto.Unmarshal(entry.GetStoreValue(), change); err != nil {
+			return result, fmt.Errorf("decode row change: %w", err)
+		}
+		tableName := entry.GetHeader().GetTableName()
+		index := c.Index
+		if len(c.TableMap) > 0 {
+			v, ok := c.TableMap[tableName]
+			if ok {
+				index = v
+			}
+		}
+		for _, row := range change.GetRowDatas() {
+			// c.Log.Debug(ctx, "Sync_Change %v %v", tableName, row.GetBeforeColumns(), row.GetAfterColumns())
+			columns := row.GetAfterColumns()
+			action := ActionIndex
+			if change.GetEventType() == pbe.EventType_DELETE {
+				columns = row.GetBeforeColumns()
+				action = ActionDelete
+			}
+			id, doc := DefaultColsToDoc(columns)
+			if id == "" {
+				return result, errors.New("doc has no primary key")
+			}
+			c.Log.Debug(ctx, "Sync_Values %s %s %v", tableName, id, doc)
+			result = append(result, Entry{
+				Id:    id,
+				Act:   action,
+				Index: index,
+				Doc:   doc,
+			})
+		}
+	}
+	return result, nil
 }
 
 // statsInterval := c.Option.StatsInterval

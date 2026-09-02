@@ -13,3 +13,19 @@ syncs:
     filter: "example\\..*"
     batch: 100
     timeout: 1s
+migrates:
+  - db_ip: mysql
+    db_port: 3306
+    db_instance: example
+    db_name: example
+    db_user: root
+    db_pwd: ""
+    table_args: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+    cursor_field: id
+    cursor_type: 0
+    cursor_pos: "0"
+    instance: example
+    index: example
+    filter: "example_%d"
+    batch: 100
+    timeout: 1s

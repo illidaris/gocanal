@@ -48,7 +48,7 @@ func Run() {
 		ginhandle.WithCollectors(canalEx.ReqNum, canalEx.DeleteNum, canalEx.IndexNum),
 		ginhandle.WithGinInnerHandle(func(e *gin.Engine) {}),
 	)
-	canal.Go(ctx)
+	canal.Sync(ctx)
 
 	port := 8080
 	lsn := fmt.Sprintf(":%d", port)
