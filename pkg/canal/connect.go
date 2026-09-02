@@ -9,6 +9,7 @@ import (
 )
 
 type ISyncConnector interface {
+	Id() string
 	Stats(ctx context.Context) OperateStats
 	Close(ctx context.Context) error
 	Run(ctx context.Context) error
@@ -17,6 +18,10 @@ type ISyncConnector interface {
 type SyncConnector struct {
 	SyncConnectorOption
 	CanalConnector *client.SimpleCanalConnector
+}
+
+func (c *SyncConnector) Id() string {
+	return c.CanalInstance
 }
 
 func (c *SyncConnector) Stats(ctx context.Context) OperateStats {
@@ -65,7 +70,7 @@ func (c *SyncConnector) Run(ctx context.Context) error {
 			time.Sleep(300 * time.Millisecond)
 			continue
 		}
-		ok, err := c.Outer.Sync(ctx, c.Index, message.Entries...)
+		ok, err := c.Outer.Sync(ctx, c.Index, DefaultColsToDoc, message.Entries...)
 		if err != nil {
 			c.Logger.Error(ctx, "[gocanal]Run_SyncFunc canal entries to Outer: %v", err)
 			return err

@@ -30,7 +30,7 @@ func NewElasticOuterOption(opts ...ElasticOuterOptionFunc) *ElasticOuterOption {
 		FlushBytes:    5 * 1024 * 1024,
 		FlushInterval: 1 * time.Second,
 		BaseOuter: canal.BaseOuter{
-			ColsToKVs: canal.DefaultColsToDoc,
+			Log: canal.DefaultLogger{},
 		},
 	}
 	return option.WithOption(opts...)
@@ -134,6 +134,11 @@ type ElasticOuter struct {
 	canal.BaseOuter
 }
 
+func (i *ElasticOuter) WithLogger(logger canal.ILogger) *ElasticOuter {
+	i.Log = logger
+	return i
+}
+
 func (i ElasticOuter) Stats() canal.OperateStats {
 	s := i.Core.Stats()
 	return convertStatsToOperateStats(s)
@@ -143,7 +148,7 @@ func (i ElasticOuter) Close(ctx context.Context) error {
 	return i.Core.Close(ctx)
 }
 
-func (i ElasticOuter) Sync(ctx context.Context, index string, entries ...pbe.Entry) (bool, error) {
+func (i ElasticOuter) Sync(ctx context.Context, index string, colsToKVs canal.ColsToKVsHandle, entries ...pbe.Entry) (bool, error) {
 	var (
 		wg     sync.WaitGroup
 		failed atomic.Bool
@@ -163,22 +168,18 @@ func (i ElasticOuter) Sync(ctx context.Context, index string, entries ...pbe.Ent
 			index = i.TableMap[tableName]
 		}
 		for _, row := range change.GetRowDatas() {
-			if i.ValueChangeCb != nil {
-				i.ValueChangeCb(ctx, tableName, row.GetBeforeColumns(), row.GetAfterColumns())
-			}
+			// i.Log.Debug(ctx, "Sync_Change %v %v", tableName, row.GetBeforeColumns(), row.GetAfterColumns())
 			columns := row.GetAfterColumns()
 			action := canal.ActionIndex
 			if change.GetEventType() == pbe.EventType_DELETE {
 				columns = row.GetBeforeColumns()
 				action = canal.ActionDelete
 			}
-			id, doc := i.ColsToKVs(columns)
+			id, doc := colsToKVs(columns)
 			if id == "" {
 				return false, errors.New("doc has no primary key")
 			}
-			if i.KVsCb != nil {
-				i.KVsCb(ctx, tableName, id, doc)
-			}
+			i.Log.Debug(ctx, "Sync_Values %s %s %v", tableName, id, doc)
 			item := esutil.BulkIndexerItem{
 				Index:      index,
 				Action:     string(action),

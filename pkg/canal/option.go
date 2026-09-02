@@ -36,7 +36,7 @@ func NewSyncConnectorOption(opts ...SyncConnectorOptionFunc) *SyncConnectorOptio
 		CanalSoTimeout:   60000,
 		CanalIdleTimeout: 60 * 60 * 1000,
 		TableFilter:      ".*\\..*",
-		Logger:           defaultLogger{},
+		Logger:           DefaultLogger{},
 	}
 	return option.WithOption(opts...)
 }

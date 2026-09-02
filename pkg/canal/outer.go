@@ -33,14 +33,12 @@ type ValueChangeCbHandle func(context.Context, string, []*pbe.Column, []*pbe.Col
 type IOuter interface {
 	Stats() OperateStats
 	Close(context.Context) error
-	Sync(context.Context, string, ...pbe.Entry) (bool, error)
+	Sync(context.Context, string, ColsToKVsHandle, ...pbe.Entry) (bool, error)
 }
 
 type BaseOuter struct {
-	TableMap      map[string]string
-	ColsToKVs     ColsToKVsHandle
-	KVsCb         KVsCbHandle
-	ValueChangeCb ValueChangeCbHandle
+	TableMap map[string]string
+	Log      ILogger
 }
 
 type StdOuter struct {
@@ -61,7 +59,7 @@ func (i *StdOuter) Close(context.Context) error {
 	return nil
 }
 
-func (i *StdOuter) Sync(_ context.Context, index string, entries ...pbe.Entry) (bool, error) {
+func (i *StdOuter) Sync(_ context.Context, index string, colsToKVs ColsToKVsHandle, entries ...pbe.Entry) (bool, error) {
 	for k := range entries {
 		entry := &entries[k]
 		change := new(pbe.RowChange)
@@ -75,7 +73,7 @@ func (i *StdOuter) Sync(_ context.Context, index string, entries ...pbe.Entry) (
 				columns = row.GetBeforeColumns()
 				action = ActionDelete
 			}
-			id, doc := i.ColsToKVs(columns)
+			id, doc := colsToKVs(columns)
 			i.Counter.Add(1)
 			fmt.Printf("[%s]%s %v", action, id, doc)
 		}
