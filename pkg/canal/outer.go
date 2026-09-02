@@ -34,12 +34,16 @@ type IOuter interface {
 	Stats() OperateStats
 	Close(context.Context) error
 	Sync(context.Context, string, ColsToKVsHandle, ...pbe.Entry) (bool, error)
+	Check(ctx context.Context, key string) error
+	SyncStruct(ctx context.Context, key, index, mapping string) error
 }
 
 type BaseOuter struct {
 	TableMap map[string]string
 	Log      ILogger
 }
+
+var _ = IOuter(&StdOuter{})
 
 type StdOuter struct {
 	BaseOuter
@@ -79,4 +83,12 @@ func (i *StdOuter) Sync(_ context.Context, index string, colsToKVs ColsToKVsHand
 		}
 	}
 	return true, nil
+}
+
+func (i *StdOuter) Check(ctx context.Context, key string) error {
+	return nil
+}
+
+func (i *StdOuter) SyncStruct(ctx context.Context, key, index, mapping string) error {
+	return nil
 }

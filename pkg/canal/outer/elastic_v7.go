@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"gocanal/pkg/canal"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -146,6 +147,51 @@ func (i ElasticOuter) Stats() canal.OperateStats {
 
 func (i ElasticOuter) Close(ctx context.Context) error {
 	return i.Core.Close(ctx)
+}
+
+func (i ElasticOuter) GetEs(ctx context.Context, key string) (*elasticsearch.Client, error) {
+	es, ok := clients[key]
+	if !ok {
+		return es, errors.New("no found es client")
+	}
+	return es, nil
+}
+
+func (i ElasticOuter) Check(ctx context.Context, key string) error {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+	es, err := i.GetEs(ctx, key)
+	if err != nil {
+		return err
+	}
+	res, err := es.Ping(es.Ping.WithContext(ctx))
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+	if res.IsError() {
+		return fmt.Errorf("%s状态%s", key, res.Status())
+	}
+	return nil
+}
+
+func (i ElasticOuter) SyncStruct(ctx context.Context, key, index, mapping string) error {
+	es, err := i.GetEs(ctx, key)
+	if err != nil {
+		return err
+	}
+	createRes, err := es.Indices.Create(
+		index,
+		es.Indices.Create.WithContext(ctx),
+		es.Indices.Create.WithBody(strings.NewReader(mapping)), // 核心步骤
+	)
+	if err != nil {
+		return err
+	}
+	if !createRes.IsError() {
+		return fmt.Errorf("错误原因: %s", createRes.String())
+	}
+	return nil
 }
 
 func (i ElasticOuter) Sync(ctx context.Context, index string, colsToKVs canal.ColsToKVsHandle, entries ...pbe.Entry) (bool, error) {
