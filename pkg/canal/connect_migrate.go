@@ -42,8 +42,8 @@ func (c *MigrateConnector) Run(ctx context.Context) error {
 		}
 		return 0, nil
 	}, c.TableArgs)
+	c.Log.Info(ctx, "Run: %s", c.Outer.Stats().GetMsg(","))
 	return nil
-
 }
 
 func (c *MigrateConnector) run(ctx context.Context, tid int) error {

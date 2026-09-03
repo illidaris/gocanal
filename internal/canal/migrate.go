@@ -61,5 +61,4 @@ func Migrate(ctx context.Context) {
 			return
 		}
 	}
-
 }
