@@ -3,11 +3,13 @@ package server
 import (
 	"context"
 	"fmt"
+	"gocanal/config"
 	"gocanal/internal/canal"
 	"gocanal/pkg/log"
 	"strings"
 
 	canalEx "github.com/illidaris/aphrodite/pkg/canal"
+	"github.com/spf13/viper"
 
 	"github.com/illidaris/aphrodite/ginhandle/middleware"
 
@@ -21,6 +23,11 @@ import (
 
 func Run() {
 	ctx := context.Background()
+	cfg := &config.Config{}
+	if err := viper.Unmarshal(cfg); err != nil {
+		log.Error(ctx, "Failed to unmarshal config: %v", err)
+		return
+	}
 	engine := ginhandle.NewGin(
 		// ginhandle.WithMode(config.GetString("app.mode")),
 		ginhandle.WithParamMiddleware(true,
@@ -51,8 +58,7 @@ func Run() {
 	)
 	canal.Sync(ctx)
 
-	port := 8080
-	lsn := fmt.Sprintf(":%d", port)
+	lsn := fmt.Sprintf(":%d", cfg.Port)
 	// run
 	ginEx.GracefulRunWithAop(ctx, engine, lsn, time.Second*5, func(_ int) {}, func() {})
 }

@@ -3,6 +3,7 @@ package config
 import "time"
 
 type Config struct {
+	Port      int64           `json:"port" yaml:"port" mapstructure:"port"`
 	EsName    string          `json:"es_name" yaml:"es_name" mapstructure:"es_name"`
 	EsUrls    []string        `json:"es_urls" yaml:"es_urls" mapstructure:"es_urls"`
 	ESUser    string          `json:"es_user" yaml:"es_user" mapstructure:"es_user"`
