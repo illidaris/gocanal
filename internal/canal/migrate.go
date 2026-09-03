@@ -14,6 +14,9 @@ import (
 )
 
 func Migrate(ctx context.Context, args ...string) {
+	if len(args) == 0 {
+		return
+	}
 	defer func() {
 		if r := recover(); r != nil {
 			log.Error(ctx, "%v", r)
