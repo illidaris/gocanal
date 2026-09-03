@@ -4,7 +4,7 @@ go 1.24.8
 
 require (
 	github.com/gin-gonic/gin v1.10.1
-	github.com/illidaris/aphrodite v0.6.3
+	github.com/illidaris/aphrodite v0.6.10
 	github.com/illidaris/core v1.0.0
 	github.com/illidaris/gin v1.3.8
 	github.com/illidaris/logger v1.2.2
