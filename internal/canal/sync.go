@@ -3,8 +3,9 @@ package canal
 import (
 	"context"
 	"gocanal/config"
-	"gocanal/pkg/canal"
-	"gocanal/pkg/canal/outer"
+
+	"github.com/illidaris/aphrodite/pkg/canal"
+	"github.com/illidaris/aphrodite/pkg/canal/outer"
 
 	"gocanal/pkg/log"
 

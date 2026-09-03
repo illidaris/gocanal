@@ -4,11 +4,12 @@ import (
 	"context"
 	"fmt"
 	"gocanal/internal/canal"
-	canalEx "gocanal/pkg/canal"
+	"gocanal/pkg/log"
 	"strings"
 
+	canalEx "github.com/illidaris/aphrodite/pkg/canal"
+
 	"github.com/illidaris/aphrodite/ginhandle/middleware"
-	"github.com/illidaris/aphroditecli/pkg/log"
 
 	"time"
 
