@@ -34,6 +34,7 @@ func Migrate(ctx context.Context) {
 		log.Error(ctx, "NewElasticOuter: %v", err)
 		return
 	}
+	defer esOuter.Close(ctx)
 
 	for _, migrateCfg := range cfg.Migrates {
 		sc, err := canal.NewMigrateConnector(

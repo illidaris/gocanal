@@ -31,6 +31,7 @@ func SyncStruct(ctx context.Context) {
 		log.Error(ctx, "NewElasticOuter: %v", err)
 		return
 	}
+	defer esOuter.Close(ctx)
 	for _, syncCfg := range cfg.Syncs {
 		syncErr := esOuter.SyncStruct(ctx, cfg.EsName, syncCfg.Index, syncCfg.Mapping)
 		if syncErr != nil {
