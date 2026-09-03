@@ -38,7 +38,7 @@ func SyncStruct(ctx context.Context, args ...string) {
 	}
 	defer esOuter.Close(ctx)
 	for _, syncCfg := range cfg.Syncs {
-		println(fmt.Sprintf("准备迁移数据：%s", syncCfg.Instance))
+		println(fmt.Sprintf("同步结构：%s", syncCfg.Instance))
 		syncErr := esOuter.SyncStruct(ctx, cfg.EsName, syncCfg.Index, syncCfg.Mapping)
 		println(fmt.Sprintf("%s 执行完毕 %v", syncCfg.Instance, syncErr))
 	}
