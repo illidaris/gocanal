@@ -1,7 +1,7 @@
 GO ?= go
 GOOS ?= linux
 GOARCH ?= amd64
-BINARY := ./bin/ares
+BINARY := ./bin/gocanal
 
 .PHONY: build tar
 
@@ -10,4 +10,4 @@ build:
 	CGO_ENABLED=0 GOOS=$(GOOS) GOARCH=$(GOARCH) $(GO) build -trimpath -o $(BINARY) .
 
 tar: build
-	tar -czvf ares.tar.gz ./bin
+	tar -czvf gocanal.tar.gz ./bin
