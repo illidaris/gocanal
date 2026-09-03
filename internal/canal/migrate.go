@@ -2,8 +2,10 @@ package canal
 
 import (
 	"context"
+	"fmt"
 	"gocanal/config"
 	"gocanal/pkg/log"
+	"slices"
 
 	"github.com/illidaris/aphrodite/pkg/canal"
 	"github.com/illidaris/aphrodite/pkg/canal/outer"
@@ -11,7 +13,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-func Migrate(ctx context.Context) {
+func Migrate(ctx context.Context, args ...string) {
 	defer func() {
 		if r := recover(); r != nil {
 			log.Error(ctx, "%v", r)
@@ -38,6 +40,10 @@ func Migrate(ctx context.Context) {
 	defer esOuter.Close(ctx)
 
 	for _, migrateCfg := range cfg.Migrates {
+		if !slices.Contains(args, migrateCfg.Instance) {
+			continue
+		}
+		println(fmt.Sprintf("准备迁移数据：%s", migrateCfg.Instance))
 		sc, err := canal.NewMigrateConnector(
 			canal.WithMigrateDbIp(migrateCfg.DbIp),
 			canal.WithMigrateDbPort(migrateCfg.DbPort),
@@ -58,9 +64,6 @@ func Migrate(ctx context.Context) {
 			return
 		}
 		err = sc.Run(ctx)
-		if err != nil {
-			log.Error(ctx, "NewMigrateConnector Run: %v", err)
-			return
-		}
+		println(fmt.Sprintf("%s执行完毕 %v", migrateCfg.Instance, err))
 	}
 }

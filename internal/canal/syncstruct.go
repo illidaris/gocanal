@@ -2,6 +2,7 @@ package canal
 
 import (
 	"context"
+	"fmt"
 	"gocanal/config"
 	"gocanal/pkg/log"
 
@@ -10,7 +11,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-func SyncStruct(ctx context.Context) {
+func SyncStruct(ctx context.Context, args ...string) {
 	defer func() {
 		if r := recover(); r != nil {
 			log.Error(ctx, "%v", r)
@@ -34,9 +35,8 @@ func SyncStruct(ctx context.Context) {
 	}
 	defer esOuter.Close(ctx)
 	for _, syncCfg := range cfg.Syncs {
+		println(fmt.Sprintf("准备迁移数据：%s", syncCfg.Instance))
 		syncErr := esOuter.SyncStruct(ctx, cfg.EsName, syncCfg.Index, syncCfg.Mapping)
-		if syncErr != nil {
-			log.Error(ctx, "SyncStruct: %s", syncErr)
-		}
+		println(fmt.Sprintf("%s 执行完毕 %v", syncCfg.Instance, syncErr))
 	}
 }
