@@ -1,0 +1,40 @@
+package canal
+
+import (
+	"context"
+	"gocanal/config"
+	"gocanal/pkg/canal/outer"
+	"gocanal/pkg/log"
+
+	"github.com/spf13/viper"
+)
+
+func SyncStruct(ctx context.Context) {
+	defer func() {
+		if r := recover(); r != nil {
+			log.Error(ctx, "%v", r)
+		}
+	}()
+	cfg := &config.Config{}
+	if err := viper.Unmarshal(cfg); err != nil {
+		log.Error(ctx, "Failed to unmarshal config: %v", err)
+		return
+	}
+
+	esOuter, err := outer.NewElasticOuter(
+		outer.WithName(cfg.EsName),
+		outer.WithEsUrls(cfg.EsUrls...),
+		outer.WithESUser(cfg.ESUser),
+		outer.WithESPwd(cfg.ESPwd),
+	)
+	if err != nil {
+		log.Error(ctx, "NewElasticOuter: %v", err)
+		return
+	}
+	for _, syncCfg := range cfg.Syncs {
+		syncErr := esOuter.SyncStruct(ctx, cfg.EsName, syncCfg.Index, syncCfg.Mapping)
+		if syncErr != nil {
+			log.Error(ctx, "SyncStruct: %s", syncErr)
+		}
+	}
+}

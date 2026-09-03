@@ -21,6 +21,7 @@ type SyncConfig struct {
 	Filter   string        `json:"filter" yaml:"filter" mapstructure:"filter"`
 	Batch    int32         `json:"batch" yaml:"batch" mapstructure:"batch"`
 	Timeout  time.Duration `json:"timeout" yaml:"timeout" mapstructure:"timeout"`
+	Mapping  string        `json:"mapping" yaml:"mapping" mapstructure:"mapping"`
 }
 
 type MigrateConfig struct {

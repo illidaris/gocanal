@@ -178,7 +178,7 @@ func (i ElasticOuter) SyncStruct(ctx context.Context, key, index, mapping string
 	if err != nil {
 		return err
 	}
-	if !createRes.IsError() {
+	if createRes.IsError() {
 		return fmt.Errorf("错误原因: %s", createRes.String())
 	}
 	return nil

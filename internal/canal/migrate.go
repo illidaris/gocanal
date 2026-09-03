@@ -45,6 +45,7 @@ func Migrate(ctx context.Context) {
 			canal.WithMigrateDbInstance(migrateCfg.Instance),
 			canal.WithMigrateIndex(migrateCfg.Index),
 			canal.WithMigrateTableFilter(migrateCfg.Filter),
+			canal.WithMigrateTableArgs(migrateCfg.TableArgs),
 			canal.WithMigrateBatch(migrateCfg.Batch),
 			canal.WithMigrateTimeout(migrateCfg.Timeout),
 			canal.WithMigrateOuter(esOuter),

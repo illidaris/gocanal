@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	acConvert "github.com/illidaris/aphrodite/pkg/convert"
@@ -33,6 +34,7 @@ func (c *MigrateConnector) Close(ctx context.Context) error {
 func (c *MigrateConnector) Run(ctx context.Context) error {
 	_, _ = group.GroupFunc(func(vs ...int) (int64, error) {
 		for _, v := range vs {
+			time.Sleep(time.Millisecond * 100)
 			err := c.run(ctx, v)
 			if err != nil {
 				return 0, err
