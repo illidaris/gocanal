@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"gocanal/config"
 	"gocanal/pkg/log"
+	"slices"
 
 	"github.com/illidaris/aphrodite/pkg/canal/outer"
 
@@ -38,6 +39,9 @@ func SyncStruct(ctx context.Context, args ...string) {
 	}
 	defer esOuter.Close(ctx)
 	for _, syncCfg := range cfg.Syncs {
+		if !slices.Contains(args, syncCfg.Instance) {
+			continue
+		}
 		println(fmt.Sprintf("同步结构：%s", syncCfg.Instance))
 		syncErr := esOuter.SyncStruct(ctx, cfg.EsName, syncCfg.Index, syncCfg.Mapping)
 		println(fmt.Sprintf("%s 执行完毕 %v", syncCfg.Instance, syncErr))
