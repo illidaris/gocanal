@@ -209,6 +209,8 @@ github.com/ianlancetaylor/demangle v0.0.0-20181102032728-5e5cf60278f6/go.mod h1:
 github.com/ianlancetaylor/demangle v0.0.0-20200824232613-28f6c0f3b639/go.mod h1:aSSvb/t6k1mPoxDqO4vJh6VOCGPwU4O0C2/Eqndh1Sc=
 github.com/illidaris/aphrodite v0.6.3 h1:MZ41Hg/ZhJedmZT+jN97P+PiKL2EXklaqELLZ6sMo1c=
 github.com/illidaris/aphrodite v0.6.3/go.mod h1:MeqIKigDQP3nC9NHWIBrdXcmcbPuTYZ2ClVww5wpDrY=
+github.com/illidaris/aphrodite v0.6.13 h1:+0kPRjInI9jhE7D+tCptmGPtmhuPpOQSJ4DZCbDC3LY=
+github.com/illidaris/aphrodite v0.6.13/go.mod h1:QC5M46gE5IHiRjVGB/R/Q+tBp4FITXAvreWVzSR/hCE=
 github.com/illidaris/core v0.0.0-20211217074620-b950c7172c68/go.mod h1:1bhQRpbhrkRmvFsxHGb4ruLkEyd20jMia8PxAvuqDtc=
 github.com/illidaris/core v1.0.0 h1:7Emm3rNRjtMaJ4fO+2Vy83VGGivb8Fj2fJoIQfNhLD8=
 github.com/illidaris/core v1.0.0/go.mod h1:1bhQRpbhrkRmvFsxHGb4ruLkEyd20jMia8PxAvuqDtc=

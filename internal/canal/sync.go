@@ -2,6 +2,7 @@ package canal
 
 import (
 	"context"
+	"encoding/json"
 	"gocanal/config"
 
 	"github.com/illidaris/aphrodite/pkg/canal"
@@ -38,6 +39,10 @@ func Sync(ctx context.Context) {
 	}
 
 	for _, syncCfg := range cfg.Syncs {
+		mps := syncCfg.Mapping
+		m := &canal.MappingInfo{}
+		_ = json.Unmarshal([]byte(mps), m)
+
 		sc, err := canal.NewSyncConnector(
 			canal.WithSyncCanalIp(cfg.CanalIp),
 			canal.WithSyncCanalPort(cfg.CanalPort),
@@ -50,6 +55,7 @@ func Sync(ctx context.Context) {
 			canal.WithSyncTimeout(syncCfg.Timeout),
 			canal.WithSyncOuter(esOuter),
 			canal.WithSyncLogger(l),
+			canal.WithColsToKVsHandle(canal.ColsToDoc(canal.DefColumnValue(m.ToFieldMap()))),
 		)
 		if err != nil {
 			log.Error(ctx, "NewSyncConnector: %v", err)
